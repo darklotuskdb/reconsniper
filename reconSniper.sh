@@ -60,8 +60,8 @@ if [ "$ALL" = true ] || [ "$SUB_ENUM" = true ]; then
 fi
 
 if [ "$ALL" = true ] || [ "$DNS_CHECK" = true ]; then
-    source "$BASE_DIR/functions/dns_check.sh"
-    run_dns_check "$tar"
+    Output_Location
+    source "$BASE_DIR/magazine/DNS-Check.sh"
 fi
 
 if [ "$ALL" = true ] || [ "$HTTP_PROBE" = true ]; then
