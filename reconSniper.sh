@@ -10,13 +10,16 @@ show_help() {
     echo "Usage: $0 [-s] [-d] [-h] [-a] <domain>"
     echo "  -a  Run all"
     echo "  -s  Run Vertical Subdomain Enumeration"
+    echo "  -z  Run Horizontal Subdomain Enumeration"
+    echo "  -c  Run to Generate Custom Subdomain Wordlist"
     echo "  -d  Run DNS check"
-    echo "  -h  Run HTTP probing"
+    echo "  -x  Run HTTP probing"
     exit 1
 }
 
 # Initialize flags
 SUB_ENUM=false
+CS_Word=false
 DNS_CHECK=false
 HTTP_PROBE=false
 ALL=false
@@ -27,11 +30,12 @@ if [ $# -lt 1 ]; then
 fi
 
 # Parse options
-while getopts "sdha" opt; do
+while getopts "aszcdh" opt; do
     case $opt in
         s) SUB_ENUM=true ;;
+        c) CS_Word=true ;;
         d) DNS_CHECK=true ;;
-        h) HTTP_PROBE=true ;;
+        x) HTTP_PROBE=true ;;
         a) ALL=true ;;
         *) show_help ;;
     esac
@@ -41,7 +45,7 @@ shift $((OPTIND -1))
 tar=$1
 
 # Validate input
-if [ -z "$tar" ] || { [ "$SUB_ENUM" = false ] && [ "$DNS_CHECK" = false ] && [ "$HTTP_PROBE" = false ] && [ "$ALL" = false ]; }; then
+if [ -z "$tar" ] || { [ "$SUB_ENUM" = false ] && [ "$DNS_CHECK" = false ] && [ "$CS_Word" = false ] && [ "$HTTP_PROBE" = false ] && [ "$ALL" = false ]; }; then
     echo "[!] Error: Please provide at least one flag and a domain."
     show_help
 fi
@@ -57,10 +61,16 @@ Output_Location() {
 if [ "$ALL" = true ] || [ "$SUB_ENUM" = true ]; then
     Output_Location
     source "$BASE_DIR/magazine/Vertical-Subdomain-Enumeration.sh"
+
+fi
+
+if [ "$ALL" = true ] || [ "$CS_Word" = true ]; then
+	Output_Location
+    source "$BASE_DIR/magazine/Custom-Subdomain-Wordlist.sh"
 fi
 
 if [ "$ALL" = true ] || [ "$DNS_CHECK" = true ]; then
-    Output_Location
+	Output_Location
     source "$BASE_DIR/magazine/DNS-Check.sh"
 fi
 
