@@ -64,6 +64,18 @@ MWlist() {
     rm -f base_words.txt
 
     echo "[+] Wordlist ready: Master_wordlist.txt"
+
+    echo "[*] Extracting exact base words from subdomains..."
+    awk -F'.' '{for(i=1;i<=NF;i++) print $i}' vertical-subdomains.txt | \
+    grep -vE '^(com|net|org|co.uk)$' | \
+    sort -u > exact_keywords.txt
+
+    echo "[*] Filtering Master_wordlist.txt..."
+    # Keep only entries NOT matching exact base keywords
+    grep -vxFf exact_keywords.txt Master_wordlist.txt > filtered-Master_wordlist.txt
+
+    echo "[+] Cleaned wordlist saved to: filtered-Master_wordlist.txt"
+    rm -f exact_keywords.txt
 }
 
 MWlist
