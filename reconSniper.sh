@@ -13,7 +13,7 @@ show_help() {
     echo "  -z  Run Horizontal Subdomain Enumeration"
     echo "  -c  Run to Generate Custom Subdomain Wordlist"
     echo "  -d  Run DNS check"
-    echo "  -x  Run HTTP probing"
+    echo "  -x  Run HTTP probing and Screenshots"
     exit 1
 }
 
@@ -30,7 +30,7 @@ if [ $# -lt 1 ]; then
 fi
 
 # Parse options
-while getopts "aszcdh" opt; do
+while getopts "aszcdhx" opt; do
     case $opt in
         s) SUB_ENUM=true ;;
         c) CS_Word=true ;;
@@ -75,6 +75,7 @@ if [ "$ALL" = true ] || [ "$DNS_CHECK" = true ]; then
 fi
 
 if [ "$ALL" = true ] || [ "$HTTP_PROBE" = true ]; then
-    source "$BASE_DIR/functions/http_probe.sh"
-    run_http_probe "$tar"
+	Output_Location
+    source "$BASE_DIR/magazine/Screenshot-And-Ports.sh"
+    
 fi

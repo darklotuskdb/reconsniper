@@ -52,6 +52,10 @@ curl -s "https://crt.sh/?Identity=%.$tar" \
   | sort -u \
   | tee -a allSD.tmp
 
+echo -e "[*] Brute-forcing using subdomains-top1million-20000.txt (can take up to ~10 minutes)"
+ffuf -u https://FUZZ.$tar/ -t 200 -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-20000.txt -c -o ffuf-vsubdomains.txt -timeout 2
+cat ffuf-vsubdomains.txt | js-beautify | grep -i '"url"' | cut -d "/" -f 3 | grep -vi "FUZZ\." >> allSD.tmp
+
 # Final sort and save
 sort -u allSD.tmp | tee vertical-subdomains.txt
 

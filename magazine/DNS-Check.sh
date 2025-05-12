@@ -3,6 +3,7 @@
 
 dnsXscan(){
 dnsx -l vertical-subdomains.txt -all -resp -retry 3 -t 50 -o dnsx_results.txt
+cat dnsx_results.txt | cut -d " " -f 1 | grep -i "\.$tar$" | grep -v '*'| sort -u > alive-dnsx_results.txt
 echo -e "\n[+] DNS scan completed. Results saved to dnsx_results.txt"
 }
 
@@ -12,7 +13,7 @@ dnsScan() {
 
   # Start dnscan in the background and write to a live output file
   /opt/dnscan/dnscan.py -d "$tar" -w filtered-Master_wordlist.txt \
-    -r -L "$BASE_DIR/config/dns-resolvers.txt" -t 50 -D \
+    -r -L "$BASE_DIR/config/dns-resolvers.txt" -t 70 -D \
     -o dns-scan-output.txt &
 
   DNSCAN_PID=$!
@@ -48,7 +49,11 @@ dnsScan() {
   echo "[+] DNS scan complete. Live results saved to: dns-scan-clean.txt"
 }
 
+dnsXscanC(){
+dnsx -l dns-scan-clean.txt -all -resp -retry 3 -t 50 -o dnsx_results_custom.txt
+echo -e "\n[+] DNS scan completed. Results saved to dnsx_results_custom.txt"
+}
 
 dnsXscan
 dnsScan
-
+dnsXscanC
