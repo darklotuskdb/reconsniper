@@ -10,7 +10,7 @@ MWlist() {
             if (length($i) > 1 && $i !~ /^[0-9]+$/) print $i
         }
     }' vertical-subdomains.txt | \
-    grep -vE '^(com|net|org|co.uk|www)$' | \
+    grep -vE '^(com|net|org|co\.uk)$' | \
     sort -u > base_words.txt
 
     echo "[*] Injecting common terms..."
@@ -22,29 +22,32 @@ MWlist() {
     echo "[*] Generating permutations and combinations..."
     > Master_wordlist.txt  # Empty output file first
 
-    # Basic base word + numbers (with zero padding)
+    # Base word + numbers (with and without zero padding)
     while read word; do
-        for n in $(seq -w 1 4); do
+        for n in $(seq 1 4); do
             echo "${word}${n}"
+            printf "%s%02d\n" "$word" "$n"
         done
     done < base_words.txt >> Master_wordlist.txt
 
-    # base-suffix & base-suffix01-10
+    # base-suffix and base-suffix1/base-suffix01
     for suffix in "${common_terms[@]}"; do
         while read word; do
             echo "${word}-${suffix}"
-            for n in $(seq -w 1 4); do
+            for n in $(seq 1 4); do
                 echo "${word}-${suffix}${n}"
+                printf "%s-%s%02d\n" "$word" "$suffix" "$n"
             done
         done < base_words.txt
     done >> Master_wordlist.txt
 
-    # prefix-base & prefix-base01-10
+    # prefix-base and prefix-base1/prefix-base01
     for prefix in "${common_terms[@]}"; do
         while read word; do
             echo "${prefix}-${word}"
-            for n in $(seq -w 1 4); do
+            for n in $(seq 1 4); do
                 echo "${prefix}-${word}${n}"
+                printf "%s-%s%02d\n" "$prefix" "$word" "$n"
             done
         done < base_words.txt
     done >> Master_wordlist.txt
