@@ -12,9 +12,9 @@ dnsScan() {
   grep -Eo "([a-zA-Z0-9_-]+\.)+${tar//./\\.}" dns-scan-output.txt | \
     grep -viE '^([0-9]{1,3}\.){3}[0-9]{1,3}$' | \
     grep -viE '^(ip6|ip4|v=|include:|spf1|dmarc|_spf|^ns[0-9]|dns[0-9])' | \
-    sort -u > dns-scan-subdomains.txt
+    sort -u > dns-scan-brute-subdomains.txt
 
-  cat dns-scan-subdomains.txt >> all-subdomains.txt
+  cat dns-scan-brute-subdomains.txt >> all-subdomains.txt
   sort -u all-subdomains.txt -o all-subdomains.txt
   
   
@@ -29,8 +29,11 @@ dnsScan() {
     grep -viE '^(ip6|ip4|v=|include:|spf1|dmarc|_spf|^ns[0-9]|dns[0-9])' | \
     sort -u > dns-scan-custom-vertical-subdomains.txt
 
-  cat dns-scan-custom-vertical-subdomains.txt >> all-subdomains.txt
+  cat dns-scan-brute-subdomains.txt dns-scan-custom-vertical-subdomains.txt > dns-scan-subdomains.txt
+  cat dns-scan-subdomains.txt >> all-subdomains.txt
+  
   sort -u all-subdomains.txt -o all-subdomains.txt
+
 
   echo "[+] DNS scan complete."
   echo "    Cleaned subdomains saved to: dns-scan-subdomains.txt"
