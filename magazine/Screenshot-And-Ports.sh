@@ -16,7 +16,7 @@ gowitness report server &
 # Wait another 5 seconds before opening browser
 sleep 5
 echo "[*] Opening report in Firefox..."
-firefox http://127.0.0.1:7171/
+firefox http://127.0.0.1:7171/ &
 }
 
 

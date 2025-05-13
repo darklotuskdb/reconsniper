@@ -40,6 +40,8 @@ dnsScan() {
   echo "    Cleaned subdomains saved to: dns-scan-subdomains.txt"
     echo "    Cleaned subdomains saved to: dns-scan-custom-vertical-subdomains.txt"
   echo "    Combined results in:         all-subdomains.txt"
+
+  rm -rf *.tmp
 }
 
 
