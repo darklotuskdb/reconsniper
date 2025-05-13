@@ -75,7 +75,7 @@ MWlist() {
 
     echo "[*] Filtering Master_wordlist.txt..."
     # Keep only entries NOT matching exact base keywords
-    grep -vxFf exact_keywords.txt Master_wordlist.txt > filtered-Master_wordlist.txt
+    grep -vxFf exact_keywords.txt Master_wordlist.txt | sort -u > filtered-Master_wordlist.txt
 
     echo "[+] Cleaned wordlist saved to: filtered-Master_wordlist.txt"
     rm -f exact_keywords.txt

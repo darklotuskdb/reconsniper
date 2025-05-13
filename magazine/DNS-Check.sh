@@ -29,7 +29,8 @@ dnsScan() {
     grep -viE '^(ip6|ip4|v=|include:|spf1|dmarc|_spf|^ns[0-9]|dns[0-9])' | \
     sort -u > dns-scan-custom-vertical-subdomains.txt
 
-  cat dns-scan-brute-subdomains.txt dns-scan-custom-vertical-subdomains.txt > dns-scan-subdomains.txt
+  cat dns-scan-brute-subdomains.txt dns-scan-custom-vertical-subdomains.txt > dns-scan-subdomains.tmp
+  grep -vxFf vertical-subdomains.txt dns-scan-subdomains.tmp | sort -u > dns-scan-subdomains.txt
   cat dns-scan-subdomains.txt >> all-subdomains.txt
   
   sort -u all-subdomains.txt -o all-subdomains.txt
