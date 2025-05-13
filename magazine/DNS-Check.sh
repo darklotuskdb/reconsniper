@@ -1,59 +1,51 @@
 #!/bin/bash
 
 
+dnsScan() {
+  echo "[*] Starting DNS scan for $tar"
+  rm -f dns-scan-output.txt dns-scan-subdomains.txt  # Clean old outputs
+
+  # Run dnscan
+  /opt/dnscan/dnscan.py -d "$tar" -w filtered-Master_wordlist.txt -L "$BASE_DIR/config/dns-resolvers.txt" -t 70 -D -o dns-scan-output.txt
+
+  echo "[*] Filtering scan output..."
+  grep -Eo "([a-zA-Z0-9_-]+\.)+${tar//./\\.}" dns-scan-output.txt | \
+    grep -viE '^([0-9]{1,3}\.){3}[0-9]{1,3}$' | \
+    grep -viE '^(ip6|ip4|v=|include:|spf1|dmarc|_spf|^ns[0-9]|dns[0-9])' | \
+    sort -u > dns-scan-subdomains.txt
+
+  cat dns-scan-subdomains.txt >> all-subdomains.txt
+  sort -u all-subdomains.txt -o all-subdomains.txt
+  
+  
+  
+
+  # Run dnscan
+  /opt/dnscan/dnscan.py -l all-subdomains.txt -w base_words.txt -r -m 4 -L "$BASE_DIR/config/dns-resolvers.txt" -t 70 -D -o dns-scan-custom-vertical-output.txt
+
+  echo "[*] Filtering scan output..."
+  grep -Eo "([a-zA-Z0-9_-]+\.)+${tar//./\\.}" dns-scan-custom-vertical-output.txt | \
+    grep -viE '^([0-9]{1,3}\.){3}[0-9]{1,3}$' | \
+    grep -viE '^(ip6|ip4|v=|include:|spf1|dmarc|_spf|^ns[0-9]|dns[0-9])' | \
+    sort -u > dns-scan-custom-vertical-subdomains.txt
+
+  cat dns-scan-custom-vertical-subdomains.txt >> all-subdomains.txt
+  sort -u all-subdomains.txt -o all-subdomains.txt
+
+  echo "[+] DNS scan complete."
+  echo "    Cleaned subdomains saved to: dns-scan-subdomains.txt"
+    echo "    Cleaned subdomains saved to: dns-scan-custom-vertical-subdomains.txt"
+  echo "    Combined results in:         all-subdomains.txt"
+}
+
+
 dnsXscan(){
-dnsx -l vertical-subdomains.txt -all -resp -retry 3 -t 50 -o dnsx_results.txt
+dnsx -l all-subdomains.txt -all -resp -retry 3 -t 50 -o dnsx_results.txt
 cat dnsx_results.txt | cut -d " " -f 1 | grep -i "\.$tar$" | grep -v '*'| sort -u > alive-dnsx_results.txt
 echo -e "\n[+] DNS scan completed. Results saved to dnsx_results.txt"
 }
 
-dnsScan() {
-  echo "[*] Starting live DNS scan for $tar"
-  rm -f dns-scan-output.txt dns-scan-clean.txt  # Clean old outputs
 
-  # Start dnscan in the background and write to a live output file
-  /opt/dnscan/dnscan.py -d "$tar" -w filtered-Master_wordlist.txt \
-    -r -L "$BASE_DIR/config/dns-resolvers.txt" -t 70 -D \
-    -o dns-scan-output.txt &
-
-  DNSCAN_PID=$!
-
-  touch dns-scan-clean.txt  # Ensure the clean file exists
-
-  while kill -0 $DNSCAN_PID 2>/dev/null; do
-    echo "[*] Filtering results at $(date '+%H:%M:%S')..."
-
-    # Extract and filter domains, then append only new ones
-    grep -Eo "([a-zA-Z0-9_-]+\.)+${tar//./\\.}" dns-scan-output.txt 2>/dev/null | \
-      grep -viE '^([0-9]{1,3}\.){3}[0-9]{1,3}$' | \
-      grep -viE '^(ip6|ip4|v=|include:|spf1|dmarc|_spf|^ns[0-9]|dns[0-9])' | \
-      sort -u > tmp-scan-clean.txt
-
-    # Only append new domains not already in clean file
-    grep -vxFf dns-scan-clean.txt tmp-scan-clean.txt >> dns-scan-clean.txt
-
-    rm -f tmp-scan-clean.txt
-    sleep 300  # Wait 5 minutes
-  done
-
-  # Final pass after dnscan completes
-  echo "[*] Final filtering pass..."
-  grep -Eo "([a-zA-Z0-9_-]+\.)+${tar//./\\.}" dns-scan-output.txt | \
-    grep -viE '^([0-9]{1,3}\.){3}[0-9]{1,3}$' | \
-    grep -viE '^(ip6|ip4|v=|include:|spf1|dmarc|_spf|^ns[0-9]|dns[0-9])' | \
-    sort -u > tmp-scan-clean.txt
-
-  grep -vxFf dns-scan-clean.txt tmp-scan-clean.txt >> dns-scan-clean.txt
-  rm -f tmp-scan-clean.txt
-
-  echo "[+] DNS scan complete. Live results saved to: dns-scan-clean.txt"
-}
-
-dnsXscanC(){
-dnsx -l dns-scan-clean.txt -all -resp -retry 3 -t 50 -o dnsx_results_custom.txt
-echo -e "\n[+] DNS scan completed. Results saved to dnsx_results_custom.txt"
-}
-
-dnsXscan
 dnsScan
-dnsXscanC
+dnsXscan
+

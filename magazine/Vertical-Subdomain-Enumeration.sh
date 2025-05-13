@@ -58,6 +58,7 @@ cat ffuf-vsubdomains.txt | js-beautify | grep -i '"url"' | cut -d "/" -f 3 | gre
 
 # Final sort and save
 sort -u allSD.tmp | tee vertical-subdomains.txt
+cat vertical-subdomains.txt > all-subdomains.txt
 
 # Clean up
 rm -f *.tmp *.old.txt &> /dev/null

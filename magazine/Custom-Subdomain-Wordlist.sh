@@ -15,7 +15,7 @@ MWlist() {
 
     echo "[*] Injecting common terms..."
     # Add useful common environment/function keywords
-    common_terms=(dev test prod stage staging stg uat beta pre preprod old backup int qa demo portal api cdn edge static internal admin new)
+    common_terms=(dev test prod stage staging stg uat beta pre preprod old backup int qa demo portal api cdn edge static internal admin new store shop web)
     printf "%s\n" "${common_terms[@]}" >> base_words.txt
     sort -u base_words.txt -o base_words.txt
 
@@ -64,7 +64,7 @@ MWlist() {
 
     echo "[*] Finalizing list..."
     sort -u Master_wordlist.txt -o Master_wordlist.txt
-    rm -f base_words.txt
+#    rm -f base_words.txt
 
     echo "[+] Wordlist ready: Master_wordlist.txt"
 
